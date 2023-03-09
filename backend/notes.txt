@@ -1,0 +1,56 @@
+const currentTime = new Date();
+const bookings = await RoomModel.aggregate([
+  { $match: { room_id: 'ROOM_ID' } },
+  { $unwind: '$bookings' },
+  {
+    $match: {
+      'bookings.end_time': { $gt: currentTime }
+    }
+  },
+  {
+    $group: {
+      _id: null,
+      bookings: {
+        $push: {
+          start_time: '$bookings.start_time',
+          end_time: '$bookings.end_time'
+        }
+      }
+    }
+  }
+]);
+
+const bookedSlots = bookings.length > 0 ? bookings[0].bookings : [];
+
+const availableSlots = [];
+let startTime = new Date();
+let endTime = new Date();
+
+for (let i = 0; i < bookedSlots.length; i++) {
+  endTime = bookedSlots[i].start_time;
+  if (startTime < endTime) {
+    availableSlots.push({
+      start_time: startTime,
+      end_time: endTime
+    });
+  }
+  startTime = bookedSlots[i].end_time;
+}
+
+if (startTime < futureTime) {
+  availableSlots.push({
+    start_time: startTime,
+    end_time: futureTime
+  });
+}
+This query first matches the room with the given room_id. It then uses $unwind to flatten the bookings array so that each booking is a separate document. It then matches the bookings whose end_time is greater than the present time. After that, it groups the bookings into an array using $group.
+
+The result of this query will be an array of booked slots. We then iterate over these booked slots to find the available time slots. We start with the present time as the start time, and the start time of the first booked slot as the end time. If there is a gap between the end time of the previous booked slot and the start time of the current booked slot, we add that gap as an available time slot. We continue this process until we reach the end of the booked slots array, and if there is a gap between the end time of the last booked slot and the future time, we add that gap as an available time slot as well.
+
+The result of this query will be an array of available time slots, which you can then use to display to the admin.
+
+
+
+
+
+
