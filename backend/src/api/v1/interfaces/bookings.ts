@@ -15,3 +15,10 @@ export interface Booking {
   // Define the BookingModel interface, which extends the Model interface from Mongoose and specifies the generic type parameter to be BookingDocument
   export interface BookingModel extends Model<BookingDocument> {}
   
+  export interface BookingRequest extends Document {
+    email: string;
+    room: string;
+    startTime: string;
+    endTime: string;
+    price: number;
+  }

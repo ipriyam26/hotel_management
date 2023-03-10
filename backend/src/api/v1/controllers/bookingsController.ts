@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
+import { createBooking } from "../services/bookings";
 
 export const GetAllBookings = async (req: Request, res: Response) => {
   res.status(StatusCodes.OK).json({
@@ -16,9 +17,7 @@ export const GetBookingById = async (req: Request, res: Response) => {
 };
 
 export const CreateBooking = async (req: Request, res: Response) => {
-  res.status(StatusCodes.CREATED).json({
-    message: "CreateBooking",
-  });
+  createBooking(req, res);
 };
 
 export const UpdateBooking = async (req: Request, res: Response) => {
