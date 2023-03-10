@@ -8,4 +8,5 @@ export const getRoomsAndTypes =async () => {
     const roomTypesLocal = await roomTypeModel.find().exec() as RoomTypeDocument[];
     rooms = roomsLocal;
     roomTypes = roomTypesLocal;
+    return {rooms,roomTypes};
 }

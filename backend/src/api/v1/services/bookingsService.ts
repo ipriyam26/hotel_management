@@ -1,19 +1,24 @@
-import { bookingModel } from '../models';
+import { bookingModel, roomTypeModel } from '../models';
 import { BookingDocument, Booking, BookingRequest, RoomDocument, RoomTypeDocument } from '../interfaces';
 import { roomModel } from '../models';
 import { Request,Response } from 'express';
+import { roomTypes,rooms } from './room';
 
 export const createBooking = async (req: Request<{},{},BookingRequest>, res: Response) => {
 //   try {
-      console.log(req.body);
+
     const { email, room, startTime, endTime } = req.body ;
     const start = new Date(startTime);
     const end = new Date(endTime);
+
+    if (start.getTime() < Date.now() || end.getTime() < Date.now()) {
+      return res.status(400).send({ message: 'Booking start and end times must be in the future' });
+    }
     const rrm = await roomModel.findById(room);
-    console.log(rrm);
+
     // Calculate the price based on the selected room type and booking duration
-    const roomDoc = await (rrm).populated('type');
-    const { hourlyRate } = roomDoc.type as RoomTypeDocument; // Retrieve hourlyRate from room type
+    const roomDoc = roomTypeModel.findById(rrm?.type);
+    const hourlyRate = (await roomDoc).hourlyRate; // Retrieve hourlyRate from room type
 
     const bookingDuration = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Convert duration to hours
     const price = hourlyRate * bookingDuration;
@@ -44,3 +49,4 @@ export const createBooking = async (req: Request<{},{},BookingRequest>, res: Res
 //     res.status(500).send({ message: 'An error occurred while creating the booking', error });
 //   }
 };
+

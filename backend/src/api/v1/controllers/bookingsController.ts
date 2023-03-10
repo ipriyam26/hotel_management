@@ -1,14 +1,13 @@
 import { StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
-import { createBooking } from "../services/bookingsService";
+import { createBooking, deleteBooking, getAllBookings, updateBooking } from "../services";
 import { rooms } from "../services/room";
+import { BookingRequest } from "../interfaces";
+
+
 
 export const GetAllBookings = async (req: Request, res: Response) => {
-  console.log(rooms);
-  
-  res.status(StatusCodes.OK).json({
-    message: "GetAllBookings",
-  });
+  getAllBookings(req, res);
 };
 
 export const GetBookingById = async (req: Request, res: Response) => {
@@ -23,18 +22,12 @@ export const CreateBooking = async (req: Request, res: Response) => {
   createBooking(req, res);
 };
 
-export const UpdateBooking = async (req: Request, res: Response) => {
-  const id = req.params.id;
-
-  res.status(StatusCodes.OK).json({
-    message: `UpdateBooking ${id}`,
-  });
+export const UpdateBooking = async (req:  Request<{ id: string }, {}, BookingRequest>, res: Response) => {
+ updateBooking(req, res);
 };
 
 export const DeleteBooking = async (req: Request, res: Response) => {
-  const id = req.params.id;
 
-  res.status(StatusCodes.OK).json({
-    message: `DeleteBooking ${id}`,
-  });
+  deleteBooking(req, res);
+
 };
