@@ -1,26 +1,114 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import moment from "moment";
+import TimelineItemRenderer from 'react-calendar-timeline';
+import Timeline from "react-calendar-timeline";
+import generateData, { Group, Item } from "./generate-random";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+const keys = {
+  groupIdKey: "id",
+  groupTitleKey: "title",
+  groupRightTitleKey: "rightTitle",
+  itemIdKey: "id",
+  itemTitleKey: "title",
+  itemDivTitleKey: "title",
+  itemGroupKey: "group",
+  itemTimeStartKey: "start",
+  itemTimeEndKey: "end",
+  groupLabelKey: "title"
+};
+
+ const App = () => {
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
+  const [defaultTimeStart, setDefaultTimeStart] = useState(moment().startOf("day").toDate());
+  const [defaultTimeEnd, setDefaultTimeEnd] = useState(moment().startOf("day").add(1, "day").toDate());
+
+
+
+  function itemRenderer({
+    //@ts-ignore
+    item, itemContext, getItemProps, getResizeProps,
+  }) {
+    const {
+      left: leftResizeProps, right: rightResizeProps,
+    } = getResizeProps();
+
+    const backgroundColor = item.selected ? itemContext.selectedColor : itemContext.bgColor;
+
+    return (
+      <div
+        {...getItemProps({
+          style: {
+            backgroundColor,
+            color: itemContext.color,
+            borderColor: itemContext.color,
+            left: `${itemContext.left}px`,
+            width: `${itemContext.width}px`,
+          },
+          onMouseDown: itemContext.dragStart,
+          onMouseUp: itemContext.dragEnd,
+        })}
+      >
+        {itemContext.useResizeHandle ? (
+          <div
+            {...leftResizeProps}
+            style={{
+              position: 'absolute',
+              height: '100%',
+              width: '10px',
+              left: '-5px',
+              cursor: 'col-resize',
+            }} />
+        ) : null}
+
+        <div
+          style={{
+            height: itemContext.dimensions.height,
+            overflow: 'hidden',
+            paddingLeft: 3,
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+          {item.title}
+        </div>
 
+        {itemContext.useResizeHandle ? (
+          <div
+            {...rightResizeProps}
+            style={{
+              position: 'absolute',
+              height: '100%',
+              width: '10px',
+              right: '-5px',
+              cursor: 'col-resize',
+            }} />
+        ) : null}
+      </div>
+    );
+  }
+
+
+  React.useEffect(() => {
+    const { groups, items } = generateData();
+    setGroups(groups);
+    setItems(items);
+  }, []);
+
+  return (
+    <Timeline
+      groups={groups}
+
+      items={[]}
+      keys={keys}
+      itemTouchSendsClick={false}
+      stackItems
+      itemHeightRatio={0.75}
+      canMove={false}
+      canResize={false}
+      defaultTimeStart={defaultTimeStart}
+      defaultTimeEnd={defaultTimeEnd}
+      itemRenderer={itemRenderer}
+    />);
+}
 export default App;
