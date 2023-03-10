@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import moment from "moment";
-import TimelineItemRenderer from 'react-calendar-timeline';
 import Timeline from "react-calendar-timeline";
 import generateData, { Group, Item } from "./generate-random";
 
@@ -98,8 +97,8 @@ const keys = {
   return (
     <Timeline
       groups={groups}
-
-      items={[]}
+    //@ts-ignore
+      items={items}
       keys={keys}
       itemTouchSendsClick={false}
       stackItems
