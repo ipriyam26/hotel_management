@@ -8,6 +8,7 @@ import { connectDB } from "./api/v1/db";
 import config from "./config/constants";
 import {bookingsRouter,roomRouter} from "./api/v1/routes";
 import * as dotenv from "dotenv";
+import { getRoomsAndTypes } from "./api/v1/services/room";
 dotenv.config();
 
 
@@ -36,6 +37,7 @@ const start = async () => {
     try {
         // console.log(process.env.MONGO_URL)
         await connectDB(process.env.MONGO_URL);
+        getRoomsAndTypes();
         app.listen(config.port, () => {
         console.log(`Listening on port ${config.port}!`);
         });

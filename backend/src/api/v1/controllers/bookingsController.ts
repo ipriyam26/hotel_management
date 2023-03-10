@@ -1,8 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 import { Request, Response } from "express";
-import { createBooking } from "../services/bookings";
+import { createBooking } from "../services/bookingsService";
+import { rooms } from "../services/room";
 
 export const GetAllBookings = async (req: Request, res: Response) => {
+  console.log(rooms);
+  
   res.status(StatusCodes.OK).json({
     message: "GetAllBookings",
   });
