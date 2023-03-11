@@ -51,12 +51,10 @@ export const createBooking = async (
   });
 
   if (overlappingBookings.length > 0) {
-    return res
-      .status(409)
-      .send({
-        message:
-          "The selected room is not available during the requested time period",
-      });
+    return res.status(409).send({
+      message:
+        "The selected room is not available during the requested time period",
+    });
   }
 
   // Create a new booking document
@@ -71,6 +69,7 @@ export const createBooking = async (
   // Save the new booking document to the database
   await newBooking.save();
 
+  
   res
     .status(201)
     .send({ message: "Booking created successfully", booking: newBooking });
