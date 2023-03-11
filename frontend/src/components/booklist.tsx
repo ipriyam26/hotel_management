@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { bookings } from "../App";
+import { Booking, Room } from "../types";
 
 const today = new Date();
 const currentTime = today.getTime();
 interface Props {
-    roomNumbers: string[],
-    bookings: bookings[]
+    roomNumbers: Room[],
+    bookings: Booking[]
 }
 
 const BookingList = ({ roomNumbers, bookings }: Props): JSX.Element => {
-    const [occupiedRooms, setOccupiedRooms] = useState<String[]>([]);
+    const [occupiedRooms, setOccupiedRooms] = useState<Room[]>([]);
     // const [freeRooms, setFreeRooms] = useState<String[]>([]);
 
     useEffect(() => {
@@ -23,7 +24,7 @@ const BookingList = ({ roomNumbers, bookings }: Props): JSX.Element => {
             for (let j = 0; j < bookings.length; j++) {
                 const booking = bookings[j];
 
-                if (booking.roomNumber === room) {
+                if (booking.room.number === room.number) {
                     const start = new Date(booking.startTime).getTime();
                     const end = new Date(booking.endTime).getTime();
 
@@ -54,11 +55,11 @@ const BookingList = ({ roomNumbers, bookings }: Props): JSX.Element => {
                 <div className="grid grid-cols-6 gap-2">
                     {roomNumbers.map((room) => (
                         <div
-                            key={room}
+                            key={room._id}
                             className={`col-span-2 w-24  flex items-center justify-center rounded-xs font-bold text-white ${occupiedRooms.includes(room) ? "bg-red-500" : "bg-green-600"
                                 }`}
                         >
-                            {room}
+                            {room.number}
                         </div>
                     ))}
                 </div>
