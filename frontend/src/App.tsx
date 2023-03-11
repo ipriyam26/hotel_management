@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import NavBar from "./components/navbar";
-import SearchBox from "./components/search";
 import TimePicker from "./components/timepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import BookingList from "./components/booklist";
-import { AllRoomsResponse, ApiResponse, Booking, BookingsByRoomType, BookingUpdate, createBookingResponse } from "./types";
+import { AllRoomsResponse, ApiResponse, Booking, BookingUpdate, createBookingResponse } from "./types";
 import { API_URL } from "./constants";
 
 export interface bookings {
@@ -200,8 +199,48 @@ const App = () => {
       "endTime": new Date().toISOString(),
       "price": 0,
       "__v": 0
-    },)
+    },);
 
+  }
+  // {
+  //   "message": "Booking deleted successfully",
+  //   "refundPercent": 100,
+  //   "refundAmount": 320
+  // }
+  type deleteBookingResponse = {
+    message: string;
+    refundPercent: number;
+    refundAmount: number;
+  }
+
+  const handleDelete = async (bookingId: string) => {
+    const response = await fetch(`${API_URL}/bookings/${bookingId}`, {
+      method: "DELETE",
+    });
+    const res: deleteBookingResponse = await response.json();
+
+    if (res.message !== "Booking deleted successfully") {
+      alert("Something went wrong");
+      return;
+    }
+    alert(`Booking deleted successfully. Refund amount: ${res.refundAmount}. Refund percentage: ${res.refundPercent}%`);
+
+    const newBookings = bookings.filter(booking => booking._id !== bookingId);
+    setAllBookings(newBookings);
+    setModel({
+      "_id": "",
+      "email": "",
+      "room": {
+        "_id": "",
+        "number": "",
+        "type": "",
+        "__v": 0
+      },
+      "startTime": new Date().toISOString(),
+      "endTime": new Date().toISOString(),
+      "price": 0,
+      "__v": 0
+    },);
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -230,7 +269,7 @@ const App = () => {
     }
     // match roomType to allRooms.roomType and return price
     if (allRooms) {
-      const room = allRooms.roomTypes.find(room => room.name === roomType);
+      const room = allRooms.roomTypes.find(room => room._id === roomType);
       if (room) {
 
         return duration * room.hourlyRate;
@@ -271,36 +310,36 @@ const App = () => {
       <div className="bg-gray-800 px-4 py-8">
         <div className="flex justify-center">
           <div className="md:flex md:justify-evenly md:w-full max-w-7xl">
-            <div id="currentBookings" className="bg-gray-900 shadow-md p-3 w-96 h-64 rounded-lg mb-5">
-              <div className="text-lg font-sans text-white">
+            <div id="currentBookings" className="bg-gray-900 shadow-md p-3 w-96 h-52 rounded-lg mb-5">
+              <div className="text-xl font-sans text-white">
                 Active Bookings
               </div>
-              <div className="text-5xl text-center font-bold text-yellow-500 mt-12">
+              <div className="text-5xl text-center font-bold text-yellow-500 mt-10">
                 {
                   // find all bookings where endTime is greater than current time
                   bookings.filter(booking => new Date(booking.endTime).getTime() > new Date().getTime()).length
                 }
               </div>
             </div>
-            <div id="currentBookings" className="bg-gray-900 shadow-md p-3 w-96 h-64 rounded-lg mb-5">
-              <div className="text-lg font-sans text-white">
-                Available Sales
+            <div id="currentBookings" className="bg-gray-900 shadow-md p-3 w-96 h-52 rounded-lg mb-5">
+              <div className="text-xl font-sans text-white">
+                24H Sales
               </div>
-              <div className="text-5xl text-center font-bold text-green-500 mt-12">
+              <div className="text-5xl text-center font-bold text-green-500 mt-10">
                 {
                   // find the the number of bookings where startTime is greater than last 24 hours
                   bookings.filter(booking => new Date(booking.startTime).getTime() > new Date().getTime() - 24 * 60 * 60 * 1000).length
                 }
               </div>
             </div>
-            <div id="currentBookings" className="bg-gray-900 shadow-md p-3 w-96 h-64 rounded-lg mb-5">
-              <div className="text-lg font-sans text-white">
-                Total Sales
+            <div id="currentBookings" className="bg-gray-900 shadow-md p-3 w-96 h-52 rounded-lg mb-5">
+              <div className="text-xl font-sans text-white">
+                Total Active Sales
               </div>
-              <div className="text-5xl text-center font-bold text-blue-500 mt-12">
+              <div className="text-5xl text-center font-bold text-blue-500 mt-10">
                 {`₹${
                   // find the the number of bookings where startTime is greater than last 24 hours
-                  bookings.filter(booking => new Date(booking.startTime).getTime() > new Date().getTime() - 24 * 60 * 60 * 1000).reduce((acc, booking) => acc + booking.price, 0)
+                  bookings.filter(booking => new Date(booking.startTime).getTime() > new Date().getTime() - 24 * 60 * 60 * 1000).reduce((acc, booking) => acc + booking.price, 0).toFixed(2)
                   }`}
               </div>
             </div>
@@ -312,9 +351,9 @@ const App = () => {
       <div className="md:grid md:grid-cols-7 md:mx-5">
         <div className="md:col-span-5">
           <div>
-            <SearchBox></SearchBox>
+            {/* <SearchBox></SearchBox> */}
 
-            <div className="mt-4">
+            <div className="">
 
               <div className="relative overflow-x-auto shadow-lg sm:rounded-lg max-h-[40rem] overflow-scroll">
                 <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -343,7 +382,7 @@ const App = () => {
                   <tbody>
                     {
                       bookings.map((booking) => {
-                        return <tr className="border-b bg-gray-800 border-gray-700 hover:bg-gray-600">
+                        return <tr key={booking._id} className="border-b bg-gray-800 border-gray-700 hover:bg-gray-600">
                           <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             {booking.email}
                           </th>
@@ -361,13 +400,22 @@ const App = () => {
                             {new Date(booking.startTime).toLocaleString()}
                           </td>
                           <td className="px-6 py-4">
-                            ₹{booking.price}
+                            ₹{booking.price.toFixed(2)}
                           </td>
-                          <td className="px-6 py-4 text-right">
-                            <button onClick={() => {
-                              setModel(booking)
-                            }} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
-                          </td>
+                          {
+                            // if start time is greater than current time, then show the edit button
+                            new Date(booking.startTime).getTime() > new Date().getTime() ?
+                              <td className={`px-6 py-4 text-right `}>
+                                <button onClick={() => {
+                                  console.log(`edit ${booking}`);
+                                  console.log(booking);
+                                  setModel(booking);
+                                }} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                              </td> :
+                              <td className={`px-6 py-4 text-right `}>
+                                <button className="font-medium  text-gray-600 dark:text-gray-500 hover:underline">Edit</button>
+                              </td>
+                          }
                         </tr>
                       })
                     }
@@ -424,7 +472,7 @@ const App = () => {
                         {new Date(booking.startTime).getHours()}:00 IST
                       </div>
 
-                      <div className="text-sm text-green-500 font-bold">₹{booking.price}</div>
+                      <div className="text-sm text-green-500 font-bold">₹{booking.price.toFixed(2)}</div>
                     </li>
                   ))}
               </ul>
@@ -499,8 +547,13 @@ const App = () => {
                         // onChange={this.handleChange}
                         >
                           {// take room number that start with room type
+                            // get room type from model.room.type nd filter allRooms.rooms
                             allRooms.rooms.filter((roomNumber) => {
-                              return roomNumber.number.startsWith(model.room.type)
+                              const roomTp = allRooms.roomTypes.find((roomType) => {
+                                return roomType._id === model.room.type
+                              })?.name;
+                              console.log(`roomTp ${roomTp}`)
+                              return roomNumber.number.startsWith(roomTp!);
                             })
                               .map((roomNumber) => {
                                 console.log(`Matched values ${roomNumber.number}`)
@@ -519,12 +572,16 @@ const App = () => {
                               // setModel({ ...model, cost: calculateCost(model.startTime, model.endTime, e.target.value) })
                             }
                           }
-                          defaultValue={model.room.type} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
+                          defaultValue={
+                            allRooms.roomTypes.find((roomType) => {
+                              return roomType._id === model.room.type
+                            })?.name
+                          } className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required
                         // onChange={this.handleChange}
                         >
                           {
                             allRooms.roomTypes.map((roomType) => {
-                              return <option value={roomType.name}>{roomType.name}</option>
+                              return <option value={roomType._id}>{roomType.name}</option>
                             })
                           }
                         </select>
@@ -551,7 +608,12 @@ const App = () => {
                         {addingNewBooking ? "Add Booking" : "Update Booking"}
                       </button>
                       {!addingNewBooking &&
-                        <button type="button" className="col-span-3 text-white font- bg-red-600 hover:bg-red-700  focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800 ml-2" >Cancel Booking</button>}
+
+                        <button
+                          onClick={() => {
+                            handleDelete(model._id)
+                          }}
+                          type="button" className="col-span-3 text-white font- bg-red-600 hover:bg-red-700  focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800 ml-2" >Cancel Booking</button>}
                     </div>
                   </form>
                 </div>
