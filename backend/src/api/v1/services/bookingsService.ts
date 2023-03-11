@@ -1,52 +1,81 @@
-import { bookingModel, roomTypeModel } from '../models';
-import { BookingDocument, Booking, BookingRequest, RoomDocument, RoomTypeDocument } from '../interfaces';
-import { roomModel } from '../models';
-import { Request,Response } from 'express';
-import { roomTypes,rooms } from './room';
+import { bookingModel, roomTypeModel } from "../models";
+import {
+  BookingDocument,
+  Booking,
+  BookingRequest,
+  RoomDocument,
+  RoomTypeDocument,
+} from "../interfaces";
+import { roomModel } from "../models";
+import { Request, Response } from "express";
+import { roomTypes, rooms } from "./room";
 
-export const createBooking = async (req: Request<{},{},BookingRequest>, res: Response) => {
-//   try {
+export const createBooking = async (
+  req: Request<{}, {}, BookingRequest>,
+  res: Response
+) => {
+  //   try {
 
-    const { email, room, startTime, endTime } = req.body ;
-    const start = new Date(startTime);
-    const end = new Date(endTime);
+  const { email, room, startTime, endTime } = req.body;
+  const start = new Date(startTime);
+  const end = new Date(endTime);
 
-    if (start.getTime() < Date.now() || end.getTime() < Date.now()) {
-      return res.status(400).send({ message: 'Booking start and end times must be in the future' });
-    }
-    const rrm = await roomModel.findById(room);
+  if (start.getTime() < Date.now() || end.getTime() < Date.now()) {
+    return res
+      .status(400)
+      .send({ message: "Booking start and end times must be in the future" });
+  }
+  if (start.getTime() > end.getTime()) {
+    return res
+      .status(400)
+      .send({ message: "Booking end time must be after start time" });
+  }
 
-    // Calculate the price based on the selected room type and booking duration
-    const roomDoc = roomTypeModel.findById(rrm?.type);
-    const hourlyRate = (await roomDoc).hourlyRate; // Retrieve hourlyRate from room type
+  const rrm = await roomModel.findById(room);
 
-    const bookingDuration = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Convert duration to hours
-    const price = hourlyRate * bookingDuration;
+  // Calculate the price based on the selected room type and booking duration
+  const roomDoc = roomTypeModel.findById(rrm?.type);
+  const hourlyRate = (await roomDoc).hourlyRate; // Retrieve hourlyRate from room type
 
-    // Check if the selected room is available during the requested time period
-    const overlappingBookings = await bookingModel.find({
-      room,
-      $or: [
-        { startTime: { $lt: startTime }, endTime: { $gt: startTime } },
-        { startTime: { $lt: endTime }, endTime: { $gt: endTime } },
-        { startTime: { $gte: startTime }, endTime: { $lte: endTime } },
-      ],
-    });
+  const bookingDuration = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Convert duration to hours
+  const price = hourlyRate * bookingDuration;
 
-    if (overlappingBookings.length > 0) {
-      return res.status(409).send({ message: 'The selected room is not available during the requested time period' });
-    }
+  // Check if the selected room is available during the requested time period
+  const overlappingBookings = await bookingModel.find({
+    room,
+    $or: [
+      { startTime: { $lt: startTime }, endTime: { $gt: startTime } },
+      { startTime: { $lt: endTime }, endTime: { $gt: endTime } },
+      { startTime: { $gte: startTime }, endTime: { $lte: endTime } },
+    ],
+  });
 
-    // Create a new booking document
-    const newBooking = new bookingModel({ email, room, startTime, endTime, price });
+  if (overlappingBookings.length > 0) {
+    return res
+      .status(409)
+      .send({
+        message:
+          "The selected room is not available during the requested time period",
+      });
+  }
 
-    // Save the new booking document to the database
-    await newBooking.save();
+  // Create a new booking document
+  const newBooking = new bookingModel({
+    email,
+    room,
+    startTime,
+    endTime,
+    price,
+  });
 
-    res.status(201).send({ message: 'Booking created successfully', booking: newBooking });
-//   } 
-//   catch (error) {
-//     res.status(500).send({ message: 'An error occurred while creating the booking', error });
-//   }
+  // Save the new booking document to the database
+  await newBooking.save();
+
+  res
+    .status(201)
+    .send({ message: "Booking created successfully", booking: newBooking });
+  //   }
+  //   catch (error) {
+  //     res.status(500).send({ message: 'An error occurred while creating the booking', error });
+  //   }
 };
-

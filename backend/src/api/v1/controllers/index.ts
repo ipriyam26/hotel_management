@@ -1,5 +1,5 @@
 import { GetAllBookings, GetBookingById, CreateBooking, UpdateBooking, DeleteBooking } from './bookingsController';
-import { GetRoomAvailability, GetRoomTypeAvailability } from './roomController';
+import { GetRoomAvailability, GetRoomTypeAvailability, GetRoomsAndTypes } from './roomController';
 
 export {
     GetAllBookings,
@@ -9,4 +9,6 @@ export {
     DeleteBooking,
     GetRoomAvailability,
     GetRoomTypeAvailability,
+    GetRoomsAndTypes
+    
 }

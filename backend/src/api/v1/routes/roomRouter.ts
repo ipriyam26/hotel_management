@@ -1,5 +1,5 @@
 import express from 'express';
-import { GetRoomAvailability, GetRoomTypeAvailability } from '../controllers';
+import { GetRoomAvailability, GetRoomTypeAvailability,GetRoomsAndTypes } from '../controllers';
 const router = express.Router();
 
 
@@ -7,5 +7,7 @@ const router = express.Router();
 router.get('/:id/availability',GetRoomAvailability);
 // get available time slots for a room of a type
 router.get('/types/:roomTypeId/availability',GetRoomTypeAvailability);
+
+router.get('/allrooms',GetRoomsAndTypes)
 
 export default router;
