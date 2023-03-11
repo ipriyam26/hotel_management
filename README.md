@@ -1,8 +1,13 @@
 # Hotel Management System
 
 This is a hotel management project consisting of both a backend and frontend. The backend uses TypeScript and Node.js, while the frontend is built with React.
+<img width="1440" alt="Screenshot 2023-03-11 at 11 15 23" src="https://user-images.githubusercontent.com/79325116/224496211-9d21e127-cae4-425d-8cd5-fd10b82e6a62.png">
+
+<img width="1440" alt="Screenshot 2023-03-11 at 11 15 21" src="https://user-images.githubusercontent.com/79325116/224496218-65f12c60-f0ae-433a-bdef-a38edaf9ae35.png">
 
 ## Backend
+
+Deployed on render : https://hotle-backend.onrender.com
 
 ### Getting started
 
