@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import BookingList from "./components/booklist";
 import { AllRoomsResponse, ApiResponse, Booking, BookingUpdate, createBookingResponse } from "./types";
 import { API_URL } from "./constants";
+import SearchBox from "./components/search";
 
 export interface bookings {
   userEmail: string,
@@ -24,7 +25,7 @@ const App = () => {
 
   // const [bookings2, setBookings] = useState<BookingsByRoomType>({});
   const [bookings, setAllBookings] = useState<Booking[]>([]);
-
+  const [tempBookings, setTempBookings] = useState<Booking[]>([]);
 
 
 
@@ -41,7 +42,8 @@ const App = () => {
           }, [] as Booking[]);
           return [...accumulator, ...roomTypeBookings];
         }, [] as Booking[]);
-
+        // deep copy of bookingsList into tempBookings
+        setTempBookings(JSON.parse(JSON.stringify(bookingsList)));
         setAllBookings(bookingsList);
         console.log(bookingsList);
       } catch (error) {
@@ -68,9 +70,7 @@ const App = () => {
   const [addingNewBooking, setAddingNewBooking] = useState(false);
   // const roomNumbers = ["A1", "A2", "A3", "B1", `B2`, `B3`, `C1`, `C2`, `C3`]
   // const roomTypes = ["A", "B", "C"]
-  const activeBookings = 9;
-  const availableSales = 9;
-  const totalSales = 900;
+ 
 
 
   const [model, setModel] = useState<Booking>(
@@ -351,7 +351,16 @@ const App = () => {
       <div className="md:grid md:grid-cols-7 md:mx-5">
         <div className="md:col-span-5">
           <div>
-            {/* <SearchBox></SearchBox> */}
+            <SearchBox
+              bookings={bookings}
+              setBookings={
+                setAllBookings
+              }
+              roomTypes={allRooms.roomTypes}
+              rooms={allRooms.rooms}
+              tempBookings={tempBookings}
+
+            ></SearchBox>
 
             <div className="">
 
