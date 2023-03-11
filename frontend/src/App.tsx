@@ -5,7 +5,7 @@ import SearchBox from "./components/search";
 import TimePicker from "./components/timepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import BookingList from "./components/booklist";
-import { AllRoomsResponse, ApiResponse, Booking, BookingsByRoomType, createBookingResponse } from "./types";
+import { AllRoomsResponse, ApiResponse, Booking, BookingsByRoomType, BookingUpdate, createBookingResponse } from "./types";
 import { API_URL } from "./constants";
 
 export interface bookings {
@@ -65,6 +65,7 @@ const App = () => {
 
 
 
+
   const [addingNewBooking, setAddingNewBooking] = useState(false);
   // const roomNumbers = ["A1", "A2", "A3", "B1", `B2`, `B3`, `C1`, `C2`, `C3`]
   // const roomTypes = ["A", "B", "C"]
@@ -90,6 +91,26 @@ const App = () => {
     },
   );
 
+  const updateBooking = async (): Promise<createBookingResponse> => {
+    const bookingId = model._id;
+    const room = allRooms?.rooms.find(room => room.number === model.room.number)?._id!;
+
+    const bookingData: BookingUpdate = {
+      email: model.email,
+      startTime: model.startTime,
+      endTime: model.endTime,
+      room: room,
+    }
+    const response = await fetch(`${API_URL}/bookings/${bookingId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bookingData),
+    });
+    const res: createBookingResponse = await response.json();
+    return res;
+  }
 
 
   const createBooking = async (): Promise<createBookingResponse> => {
@@ -162,6 +183,25 @@ const App = () => {
 
   const handleUpdateBooking = (e: React.FormEvent<HTMLFormElement>) => {
     console.log("update booking");
+    updateBooking();
+    // remove old booking from bookings array and add new booking
+    const newBookings = bookings.filter(booking => booking._id !== model._id);
+    setAllBookings([...newBookings, model]);
+    setModel({
+      "_id": "",
+      "email": "",
+      "room": {
+        "_id": "",
+        "number": "",
+        "type": "",
+        "__v": 0
+      },
+      "startTime": new Date().toISOString(),
+      "endTime": new Date().toISOString(),
+      "price": 0,
+      "__v": 0
+    },)
+
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -409,7 +449,7 @@ const App = () => {
                     setModel(
                       {
                         "_id": "",
-                        "email": "test",
+                        "email": "",
                         "room": {
                           "_id": "",
                           "number": "",
@@ -421,7 +461,9 @@ const App = () => {
                         "price": 0,
                         "__v": 0
                       },
-                    )
+                    );
+                    setAddingNewBooking(false);
+
                   }}
                   className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-hide="authentication-modal">
                   <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>

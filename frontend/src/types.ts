@@ -60,3 +60,10 @@ export interface CreateBooking {
   _id?: string;
   __v?: number;
 }
+
+export interface BookingUpdate {
+  email: string;
+  room: string;
+  startTime: string;
+  endTime: string;
+}
