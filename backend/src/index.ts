@@ -9,19 +9,19 @@ import config from "./config/constants";
 import {bookingsRouter,roomRouter} from "./api/v1/routes";
 import * as dotenv from "dotenv";
 import { getRoomsAndTypes } from "./api/v1/services/room";
-dotenv.config();
+
 
 
 const app = express();
 
 app.use(cors());
-// app.use(
-//   rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 minutes
-//     max: 15, // limit each IP to 100 requests per windowMs
-//   })
-// );
-// app.use(helmet());
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 15, // limit each IP to 100 requests per windowMs
+  })
+);
+app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(ExpressMongoSanitize(
@@ -36,7 +36,7 @@ app.use("/api/v1/rooms", roomRouter);
 const start = async () => {
     try {
         // console.log(process.env.MONGO_URL)
-        await connectDB(process.env.MONGO_URL);
+        await connectDB("mongodb+srv://ipriyam26a:kfnprHGpnvmkDGKa@cluster0.ppda2e2.mongodb.net/?retryWrites=true&w=majority");
         getRoomsAndTypes();
         app.listen(config.port, () => {
         console.log(`Listening on port ${config.port}!`);

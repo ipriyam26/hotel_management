@@ -43,9 +43,7 @@ const createBooking = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         ],
     });
     if (overlappingBookings.length > 0) {
-        return res
-            .status(409)
-            .send({
+        return res.status(409).send({
             message: "The selected room is not available during the requested time period",
         });
     }
