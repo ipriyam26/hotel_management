@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { bookings } from "../App";
 import { Booking, Room } from "../types";
 
 const today = new Date();

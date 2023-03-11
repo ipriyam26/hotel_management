@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { useEffect, useState } from "react";
 import NavBar from "./components/navbar";
-import TimePicker from "./components/timepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import BookingList from "./components/booklist";
-import { AllRoomsResponse, ApiResponse, Booking, BookingUpdate, createBookingResponse } from "./types";
+import { AllRoomsResponse, ApiResponse, Booking } from "./types";
 import { API_URL } from "./constants";
 import SearchBox from "./components/search";
 import UpdateCreate from "./components/create";
