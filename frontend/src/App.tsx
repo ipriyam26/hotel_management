@@ -114,7 +114,7 @@ const App = () => {
 
 
 
-    <div className="bg-gray-800">
+    <div className="bg-gray-800  h-screen">
       <NavBar></NavBar>
       <div className="bg-gray-800 px-4 py-8">
         <div className="flex justify-center">
